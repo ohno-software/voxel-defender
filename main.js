@@ -783,10 +783,10 @@ function animate() {
             const forward = new THREE.Vector3();
             enemy.mesh.getWorldDirection(forward);
 
-            // Create fireball projectile - single voxel ball
+            // Create fireball projectile - single orange ball
             const fireballMesh = new THREE.Mesh(
-                new THREE.BoxGeometry(0.5, 0.5, 0.5),
-                new THREE.MeshBasicMaterial({ color: 0xff4500 })
+                new THREE.SphereGeometry(0.3, 8, 8),
+                new THREE.MeshBasicMaterial({ color: 0xff6600 })
             );
             fireballMesh.position.copy(mouthPos);
             scene.add(fireballMesh);
@@ -796,7 +796,6 @@ function animate() {
                 velocity: forward.multiplyScalar(25),
                 damage: enemy.attackDamage,
                 life: 4.0,
-                particlesTimer: 0,
                 isDragonFireball: true
             });
         } else if (enemy.attackType === 'melee') {
@@ -847,38 +846,6 @@ function animate() {
                 continue;
             }
             
-            // Emit small voxel particles from fireball
-            p.particlesTimer -= delta;
-            if (p.particlesTimer <= 0) {
-                p.particlesTimer = 0.04;
-                for (let f = 0; f < 2; f++) {
-                    const size = 0.08 + Math.random() * 0.12;
-                    const fireGeo = new THREE.BoxGeometry(size, size, size);
-                    const fireColors = [0xff4500, 0xff6600, 0xff8800, 0xffaa00, 0xffcc00, 0xffdd00];
-                    const fireMat = new THREE.MeshBasicMaterial({
-                        color: fireColors[Math.floor(Math.random() * fireColors.length)],
-                        transparent: true,
-                        opacity: 0.85
-                    });
-                    const fireMesh = new THREE.Mesh(fireGeo, fireMat);
-                    fireMesh.position.copy(p.mesh.position);
-                    fireMesh.position.x += (Math.random() - 0.5) * 0.3;
-                    fireMesh.position.y += (Math.random() - 0.5) * 0.3;
-                    fireMesh.position.z += (Math.random() - 0.5) * 0.3;
-                    scene.add(fireMesh);
-                    fireParticles.push({
-                        mesh: fireMesh,
-                        velocity: new THREE.Vector3(
-                            (Math.random() - 0.5) * 2,
-                            Math.random() * 1.5,
-                            (Math.random() - 0.5) * 2
-                        ),
-                        life: 0.4 + Math.random() * 0.4,
-                        maxLife: 0.4 + Math.random() * 0.4
-                    });
-                }
-            }
-
             p.mesh.position.add(p.velocity.clone().multiplyScalar(delta));
             
             // Check collision with castle
