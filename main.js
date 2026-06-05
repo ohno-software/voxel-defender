@@ -774,27 +774,14 @@ function animate() {
         if (enemy.attackTimer > 0) continue;
 
         if (enemy.type === 'dragon') {
-            // Dragon shoots fireball missiles at castle or towers
+            // Dragon shoots fireball in the direction it is facing
             enemy.attackTimer = enemy.attackCooldown;
             const mouthPos = new THREE.Vector3(0, 2.1 * enemy.size, 2.2 * enemy.size);
             mouthPos.applyMatrix4(enemy.mesh.matrixWorld);
 
-            // Pick a target: nearest tower or castle
-            let targetPos = new THREE.Vector3(75.5, 1.5, 50);
-            let targetDamage = enemy.attackDamage;
-            let isCastleTarget = true;
-            let nearestTowerDist = enemy.attackRange;
-            let nearestTower = null;
-            for (const tower of towers) {
-                const dist = enemy.mesh.position.distanceTo(tower.mesh.position);
-                if (dist < nearestTowerDist) { nearestTowerDist = dist; nearestTower = tower; }
-            }
-            if (nearestTower) {
-                targetPos = nearestTower.mesh.position.clone();
-                targetPos.y += 1.0;
-                targetDamage = Math.floor(enemy.attackDamage * 0.5);
-                isCastleTarget = false;
-            }
+            // Get dragon's forward direction
+            const forward = new THREE.Vector3();
+            enemy.mesh.getWorldDirection(forward);
 
             // Create fireball projectile
             const fireballGroup = new THREE.Group();
@@ -808,10 +795,12 @@ function animate() {
             scene.add(fireballGroup);
 
             projectiles.push({
-                mesh: fireballGroup, target: isCastleTarget ? null : nearestTower,
-                targetPos: targetPos.clone(), damage: targetDamage, speed: 15,
-                splash: false, slow: false, isHoming: false, isArrow: false,
-                isSkyCannon: false, isDragonFireball: true, isCastleTarget: isCastleTarget
+                mesh: fireballGroup,
+                velocity: forward.multiplyScalar(25),
+                damage: enemy.attackDamage,
+                life: 4.0,
+                particlesTimer: 0,
+                isDragonFireball: true
             });
         } else if (enemy.attackType === 'melee') {
             for (const tower of towers) {
@@ -852,6 +841,89 @@ function animate() {
     // Update projectiles
     for (let i = projectiles.length - 1; i >= 0; i--) {
         const p = projectiles[i];
+        
+        if (p.isDragonFireball) {
+            p.life -= delta;
+            if (p.life <= 0) {
+                scene.remove(p.mesh);
+                projectiles.splice(i, 1);
+                continue;
+            }
+            
+            // Emit particles from fireball
+            p.particlesTimer -= delta;
+            if (p.particlesTimer <= 0) {
+                p.particlesTimer = 0.05;
+                for (let f = 0; f < 3; f++) {
+                    const fireGeo = new THREE.BoxGeometry(0.15, 0.15, 0.15);
+                    const fireColors = [0xff4500, 0xff6600, 0xff8800, 0xffaa00, 0xffcc00];
+                    const fireMat = new THREE.MeshBasicMaterial({
+                        color: fireColors[Math.floor(Math.random() * fireColors.length)],
+                        transparent: true,
+                        opacity: 0.9
+                    });
+                    const fireMesh = new THREE.Mesh(fireGeo, fireMat);
+                    fireMesh.position.copy(p.mesh.position);
+                    fireMesh.position.x += (Math.random() - 0.5) * 0.4;
+                    fireMesh.position.y += (Math.random() - 0.5) * 0.4;
+                    fireMesh.position.z += (Math.random() - 0.5) * 0.4;
+                    scene.add(fireMesh);
+                    fireParticles.push({
+                        mesh: fireMesh,
+                        velocity: new THREE.Vector3(
+                            (Math.random() - 0.5) * 3,
+                            (Math.random() - 0.5) * 3,
+                            (Math.random() - 0.5) * 3
+                        ),
+                        life: 0.3 + Math.random() * 0.3,
+                        maxLife: 0.3 + Math.random() * 0.3
+                    });
+                }
+            }
+
+            p.mesh.position.add(p.velocity.clone().multiplyScalar(delta));
+            
+            // Check collision with castle
+            const castlePos = new THREE.Vector3(75.5, 1.5, 50);
+            if (p.mesh.position.distanceTo(castlePos) < 8) {
+                gameState.castleHP -= p.damage;
+                if (gameState.castleHP <= 0) {
+                    gameState.castleHP = 0;
+                    alert('The Castle has fallen! Game Over! Refresh to restart.');
+                    location.reload();
+                }
+                updateUI();
+                scene.remove(p.mesh);
+                projectiles.splice(i, 1);
+                continue;
+            }
+            
+            // Check collision with towers
+            let hitTower = false;
+            for (const tower of towers) {
+                if (p.mesh.position.distanceTo(tower.mesh.position) < 1.5) {
+                    tower.health -= p.damage;
+                    hitTower = true;
+                    break;
+                }
+            }
+            if (hitTower) {
+                scene.remove(p.mesh);
+                projectiles.splice(i, 1);
+                for (let j = towers.length - 1; j >= 0; j--) {
+                    if (towers[j].health <= 0) { scene.remove(towers[j].mesh); towers.splice(j, 1); }
+                }
+                continue;
+            }
+            
+            // Check if out of bounds
+            if (p.mesh.position.x < -5 || p.mesh.position.x > GRID_SIZE + 5 || p.mesh.position.z < -5 || p.mesh.position.z > GRID_SIZE + 5 || p.mesh.position.y < 0) {
+                scene.remove(p.mesh);
+                projectiles.splice(i, 1);
+            }
+            continue;
+        }
+
         if (p.isSpell) {
             const currentRadius = p.mesh.geometry.parameters?.radius || 0.3;
             const newRadius = currentRadius + p.speed * delta;
@@ -931,40 +1003,6 @@ function animate() {
     const castleHpRatio = Math.max(0, gameState.castleHP / gameState.castleMaxHP);
     castleHpBar.scale.x = castleHpRatio;
     castleHpBar.material.color.setHex(castleHpRatio > 0.5 ? 0x4caf50 : (castleHpRatio > 0.25 ? 0xff9800 : 0xf44336));
-
-    // Demo dragon fire breathing
-    for (const enemy of enemies) {
-        if (enemy.isDemo && enemy.type === 'dragon') {
-            // Emit fire particles from dragon mouth
-            const mouthPos = new THREE.Vector3(0, 2.1 * enemy.size, 2.2 * enemy.size);
-            mouthPos.applyMatrix4(enemy.mesh.matrixWorld);
-            for (let f = 0; f < 3; f++) {
-                const fireGeo = new THREE.BoxGeometry(0.15, 0.15, 0.15);
-                const fireColors = [0xff4500, 0xff6600, 0xff8800, 0xffaa00, 0xffcc00];
-                const fireMat = new THREE.MeshBasicMaterial({
-                    color: fireColors[Math.floor(Math.random() * fireColors.length)],
-                    transparent: true,
-                    opacity: 0.9
-                });
-                const fireMesh = new THREE.Mesh(fireGeo, fireMat);
-                fireMesh.position.copy(mouthPos);
-                fireMesh.position.x += (Math.random() - 0.5) * 0.3;
-                fireMesh.position.y += (Math.random() - 0.5) * 0.3;
-                fireMesh.position.z += (Math.random() - 0.5) * 0.3;
-                scene.add(fireMesh);
-                fireParticles.push({
-                    mesh: fireMesh,
-                    velocity: new THREE.Vector3(
-                        (Math.random() - 0.5) * 2,
-                        (Math.random() - 0.5) * 2 - 1,
-                        3 + Math.random() * 3
-                    ),
-                    life: 0.5 + Math.random() * 0.5,
-                    maxLife: 0.5 + Math.random() * 0.5
-                });
-            }
-        }
-    }
 
     // Update fire particles
     for (let i = fireParticles.length - 1; i >= 0; i--) {
