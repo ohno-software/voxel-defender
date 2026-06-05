@@ -428,12 +428,12 @@ for (let i = 0; i < 120; i++) {
 
 // --- Tower Definitions ---
 const towerTypes = [
-    { name: 'Archer', cost: 50, range: 15, damage: 10, fireRate: 0.8, color: 0x8d6e63, projectileSpeed: 30, health: 50, antiDragon: false },
-    { name: 'Crossbow', cost: 120, range: 18, damage: 30, fireRate: 2.0, color: 0x757575, projectileSpeed: 35, splash: false, health: 80, antiDragon: false },
-    { name: 'Ballista', cost: 200, range: 25, damage: 80, fireRate: 2.5, color: 0x4e342e, projectileSpeed: 50, health: 100, antiDragon: false },
-    { name: 'Mage', cost: 350, range: 20, damage: 15, fireRate: 0.5, color: 0x9c27b0, projectileSpeed: 20, slow: true, health: 60, antiDragon: false },
-    { name: 'Sky Cannon', cost: 150, range: 30, damage: 25, fireRate: 1.5, color: 0x00bcd4, projectileSpeed: 40, health: 70, antiDragon: true, level: 1 },
-    { name: 'Sky Cannon+', cost: 300, range: 35, damage: 50, fireRate: 1.2, color: 0x0097a7, projectileSpeed: 45, health: 100, antiDragon: true, level: 2 }
+    { name: 'Archer', cost: 25, range: 15, damage: 8, fireRate: 0.8, color: 0x8d6e63, projectileSpeed: 30, health: 50, antiDragon: false },
+    { name: 'Crossbow', cost: 100, range: 18, damage: 30, fireRate: 2.0, color: 0x757575, projectileSpeed: 35, splash: false, health: 80, antiDragon: false },
+    { name: 'Ballista', cost: 300, range: 25, damage: 80, fireRate: 2.5, color: 0x4e342e, projectileSpeed: 50, health: 100, antiDragon: false },
+    { name: 'Mage', cost: 500, range: 20, damage: 15, fireRate: 0.5, color: 0x9c27b0, projectileSpeed: 20, slow: true, health: 60, antiDragon: false },
+    { name: 'Sky Cannon', cost: 1500, range: 30, damage: 25, fireRate: 1.5, color: 0x00bcd4, projectileSpeed: 40, health: 70, antiDragon: true, level: 1 },
+    { name: 'Sky Cannon+', cost: 3000, range: 35, damage: 50, fireRate: 1.2, color: 0x0097a7, projectileSpeed: 45, health: 100, antiDragon: true, level: 2 }
 ];
 let selectedTowerIndex = 0;
 
