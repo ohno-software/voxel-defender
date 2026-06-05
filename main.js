@@ -173,6 +173,13 @@ function addBlockToGroup(group, x, y, z, type) {
     mesh.receiveShadow = true;
     group.add(mesh);
 }
+function addBlock(x, y, z, type) {
+    const mesh = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), materials[type]);
+    mesh.position.set(x, y, z);
+    mesh.castShadow = true;
+    mesh.receiveShadow = true;
+    scene.add(mesh);
+}
 
 for(let x = 72; x <= 79; x++) {
     for(let z = 44; z <= 56; z++) {
