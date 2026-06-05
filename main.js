@@ -846,6 +846,8 @@ function animate() {
                 continue;
             }
             
+            // Apply gravity to fireball
+            p.velocity.y -= 15 * delta;
             p.mesh.position.add(p.velocity.clone().multiplyScalar(delta));
             
             // Check collision with castle
@@ -1039,7 +1041,7 @@ function spawnDemoEnemy(type) {
     enemies.push({
         mesh: enemyGroup, hpBar: null, hp: 100, maxHp: 100, speed: 2, baseSpeed: 2,
         reward: 0, waypointIndex: 0, slowTimer: 0, size: s, type: type,
-        attackRange: 0, attackDamage: 0, attackCooldown: 999, attackTimer: 999, attackType: 'none',
+        attackRange: 0, attackDamage: 0, attackCooldown: 3, attackTimer: 3, attackType: 'none',
         dragonFlightTarget: null, dragonFlightTimer: 0, wingPhase: Math.random() * Math.PI * 2,
         isDemo: true
     });
