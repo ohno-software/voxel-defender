@@ -1,5 +1,156 @@
 import * as THREE from 'three';
 
+// --- Sound System (Web Audio API - procedural, no files needed) ---
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+function playSound(type) {
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    const now = audioCtx.currentTime;
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+
+    switch (type) {
+        case 'place':
+            osc.type = 'square';
+            osc.frequency.setValueAtTime(440, now);
+            osc.frequency.exponentialRampToValueAtTime(880, now + 0.05);
+            gain.gain.setValueAtTime(0.15, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
+            osc.start(now); osc.stop(now + 0.1);
+            break;
+        case 'archer':
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(800, now);
+            osc.frequency.exponentialRampToValueAtTime(200, now + 0.08);
+            gain.gain.setValueAtTime(0.08, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+            osc.start(now); osc.stop(now + 0.08);
+            break;
+        case 'crossbow':
+            osc.type = 'square';
+            osc.frequency.setValueAtTime(600, now);
+            osc.frequency.exponentialRampToValueAtTime(100, now + 0.12);
+            gain.gain.setValueAtTime(0.1, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
+            osc.start(now); osc.stop(now + 0.12);
+            break;
+        case 'ballista':
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(200, now);
+            osc.frequency.exponentialRampToValueAtTime(50, now + 0.2);
+            gain.gain.setValueAtTime(0.12, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
+            osc.start(now); osc.stop(now + 0.2);
+            break;
+        case 'mage':
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(1200, now);
+            osc.frequency.exponentialRampToValueAtTime(400, now + 0.15);
+            gain.gain.setValueAtTime(0.1, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+            osc.start(now); osc.stop(now + 0.15);
+            break;
+        case 'skycannon':
+            osc.type = 'square';
+            osc.frequency.setValueAtTime(300, now);
+            osc.frequency.exponentialRampToValueAtTime(100, now + 0.25);
+            gain.gain.setValueAtTime(0.12, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+            osc.start(now); osc.stop(now + 0.25);
+            break;
+        case 'hit':
+            osc.type = 'square';
+            osc.frequency.setValueAtTime(150, now);
+            osc.frequency.exponentialRampToValueAtTime(50, now + 0.1);
+            gain.gain.setValueAtTime(0.1, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
+            osc.start(now); osc.stop(now + 0.1);
+            break;
+        case 'enemyDeath':
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(400, now);
+            osc.frequency.exponentialRampToValueAtTime(80, now + 0.2);
+            gain.gain.setValueAtTime(0.12, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
+            osc.start(now); osc.stop(now + 0.2);
+            break;
+        case 'dragonFire':
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(100, now);
+            osc.frequency.exponentialRampToValueAtTime(30, now + 0.4);
+            gain.gain.setValueAtTime(0.15, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
+            osc.start(now); osc.stop(now + 0.4);
+            break;
+        case 'dragonHit':
+            osc.type = 'square';
+            osc.frequency.setValueAtTime(80, now);
+            osc.frequency.exponentialRampToValueAtTime(20, now + 0.3);
+            gain.gain.setValueAtTime(0.15, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+            osc.start(now); osc.stop(now + 0.3);
+            break;
+        case 'waveStart':
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(440, now);
+            osc.frequency.setValueAtTime(554, now + 0.1);
+            osc.frequency.setValueAtTime(659, now + 0.2);
+            gain.gain.setValueAtTime(0.12, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
+            osc.start(now); osc.stop(now + 0.4);
+            break;
+        case 'gameOver':
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(440, now);
+            osc.frequency.exponentialRampToValueAtTime(110, now + 0.5);
+            gain.gain.setValueAtTime(0.15, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.6);
+            osc.start(now); osc.stop(now + 0.6);
+            break;
+        case 'click':
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(800, now);
+            gain.gain.setValueAtTime(0.08, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.03);
+            osc.start(now); osc.stop(now + 0.03);
+            break;
+        case 'gold':
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(1200, now);
+            osc.frequency.setValueAtTime(1500, now + 0.05);
+            gain.gain.setValueAtTime(0.08, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
+            osc.start(now); osc.stop(now + 0.1);
+            break;
+        case 'castleHit':
+            osc.type = 'square';
+            osc.frequency.setValueAtTime(60, now);
+            osc.frequency.exponentialRampToValueAtTime(20, now + 0.5);
+            gain.gain.setValueAtTime(0.2, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
+            osc.start(now); osc.stop(now + 0.5);
+            break;
+        case 'skeletonArrow':
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(1000, now);
+            osc.frequency.exponentialRampToValueAtTime(500, now + 0.06);
+            gain.gain.setValueAtTime(0.06, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.06);
+            osc.start(now); osc.stop(now + 0.06);
+            break;
+        case 'wizardSpell':
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(600, now);
+            osc.frequency.exponentialRampToValueAtTime(200, now + 0.3);
+            gain.gain.setValueAtTime(0.1, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+            osc.start(now); osc.stop(now + 0.3);
+            break;
+    }
+}
+
 // --- Game Constants ---
 const GRID_SIZE = 80;
 const CELL_SIZE = 1;
@@ -359,14 +510,15 @@ splashScreen.addEventListener('click', () => {
     splashScreen.style.display = 'none';
     uiContainer.style.display = 'block';
     towerBar.style.display = 'flex';
+    playSound('click');
 });
 window.addEventListener('blur', () => {
     if (gameState.isStarted && !gameState.isPaused) { gameState.isPaused = true; pauseScreen.style.display = 'flex'; }
 });
-pauseScreen.addEventListener('click', () => { gameState.isPaused = false; pauseScreen.style.display = 'none'; });
+pauseScreen.addEventListener('click', () => { gameState.isPaused = false; pauseScreen.style.display = 'none'; playSound('click'); });
 
 function updateUI() {
-    uiContainer.innerHTML = `<strong>Voxel Defender</strong><br>❤️ Lives: <span style="color:#ff5252">${gameState.lives}</span> | 💰 Gold: <span style="color:#ffd700">${gameState.gold}</span> | 🌊 Wave: ${gameState.wave}<br>🏰 Castle: <span style="color:#4caf50">${Math.ceil(gameState.castleHP)}</span>/${gameState.castleMaxHP}<br><small>WASD:Move Q/E:Rotate R/F:Tilt Scroll:Zoom Click:Place 1-6:Select</small>`;
+    uiContainer.innerHTML = `<strong>Voxel Defender</strong><br>❤️ Lives: <span style="color:#ff5252">${gameState.lives}</span> | 💰 Gold: <span style="color:#ffd700">${gameState.gold}</span> |  Wave: ${gameState.wave}<br> Castle: <span style="color:#4caf50">${Math.ceil(gameState.castleHP)}</span>/${gameState.castleMaxHP}<br><small>WASD:Move Q/E:Rotate R/F:Tilt Scroll:Zoom Click:Place 1-6:Select</small>`;
     towerBar.innerHTML = '';
     towerTypes.forEach((t, i) => {
         const btn = document.createElement('div');
@@ -375,7 +527,7 @@ function updateUI() {
         const isAntiDragon = t.antiDragon;
         btn.style.cssText = `width:80px; height:80px; border:3px solid ${isSelected ? '#ffffff' : (canAfford ? '#888888' : '#ff0000')}; background:${canAfford ? '#'+t.color.toString(16).padStart(6,'0') : '#333333'}; border-radius:8px; display:flex; flex-direction:column; align-items:center; justify-content:center; cursor:${canAfford ? 'pointer' : 'not-allowed'}; color:white; font-weight:bold; font-family:sans-serif; font-size:10px; text-shadow: 1px 1px 2px black; ${isAntiDragon ? 'border-style: dashed;' : ''}`;
         btn.innerHTML = `<span>${t.name}</span><span style="font-size:9px; margin-top:2px;">${t.cost}g</span>${isAntiDragon ? '<span style="font-size:8px; color:#ffeb3b;"></span>' : ''}`;
-        btn.onclick = () => { if (canAfford) selectedTowerIndex = i; updateUI(); };
+        btn.onclick = () => { if (canAfford) { selectedTowerIndex = i; updateUI(); playSound('click'); } };
         towerBar.appendChild(btn);
     });
 }
@@ -421,8 +573,6 @@ window.addEventListener('mousemove', (e) => {
             const isTown = (gx >= 2 && gx <= 12 && gz >= 60 && gz <= 74);
             const towerType = towerTypes[selectedTowerIndex];
             let canBuild = !isPathCell && !occupied && !isCastle && !isTown && gameState.gold >= towerType.cost;
-            // Anti-dragon towers can be placed anywhere (except path/castle/town/occupied)
-            // Regular towers must be adjacent to path
             if (canBuild && !towerType.antiDragon) {
                 canBuild = isAdjacentToPath(gx, gz);
             }
@@ -494,25 +644,20 @@ window.addEventListener('mousedown', (e) => {
             const orb = new THREE.Mesh(new THREE.OctahedronGeometry(0.2, 0), new THREE.MeshBasicMaterial({ color: 0xcc00ff }));
             orb.position.y = 3.0; towerGroup.add(orb);
         } else if (selectedTowerIndex === 4 || selectedTowerIndex === 5) {
-            // Sky Cannon / Sky Cannon+ - anti-dragon tower
             const isUpgraded = selectedTowerIndex === 5;
             const baseSize = isUpgraded ? 1.0 : 0.8;
             const base = new THREE.Mesh(new THREE.BoxGeometry(baseSize, 0.4, baseSize), new THREE.MeshStandardMaterial({ color: 0x37474f, metalness: 0.7 }));
             base.position.y = 1.2; base.castShadow = true; towerGroup.add(base);
-            // Tall barrel/cannon
             const barrelH = isUpgraded ? 2.5 : 2.0;
             const barrel = new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.2, barrelH, 8), new THREE.MeshStandardMaterial({ color: 0x00bcd4, metalness: 0.8, emissive: 0x004d56, emissiveIntensity: 0.3 }));
             barrel.position.y = 1.2 + barrelH / 2; barrel.castShadow = true; towerGroup.add(barrel);
-            // Cannon tip (glowing)
             const tipGeo = new THREE.SphereGeometry(0.2, 8, 8);
             const tipMat = new THREE.MeshBasicMaterial({ color: isUpgraded ? 0xff5722 : 0x00e5ff });
             const tip = new THREE.Mesh(tipGeo, tipMat);
             tip.position.y = 1.2 + barrelH + 0.1; towerGroup.add(tip);
-            // Base ring
             const ring = new THREE.Mesh(new THREE.TorusGeometry(0.35, 0.05, 6, 12), new THREE.MeshStandardMaterial({ color: 0x546e7a }));
             ring.position.y = 1.2; ring.rotation.x = Math.PI / 2; towerGroup.add(ring);
             if (isUpgraded) {
-                // Extra decorative rings for upgraded version
                 const ring2 = new THREE.Mesh(new THREE.TorusGeometry(0.4, 0.04, 6, 12), new THREE.MeshStandardMaterial({ color: 0xff9800, emissive: 0xff5722, emissiveIntensity: 0.3 }));
                 ring2.position.y = 2.0; ring2.rotation.x = Math.PI / 2; towerGroup.add(ring2);
             }
@@ -524,6 +669,7 @@ window.addEventListener('mousedown', (e) => {
         const tHpBar = new THREE.Mesh(new THREE.PlaneGeometry(0.76, 0.07), new THREE.MeshBasicMaterial({ color: 0x4caf50, side: THREE.DoubleSide, depthTest: false }));
         tHpBar.position.y = 2.2; tHpBar.position.z = 0.01; tHpBar.renderOrder = 1000; towerGroup.add(tHpBar);
         towers.push({ mesh: towerGroup, type: type, cooldown: 0, gx: gx, gz: gz, health: type.health, maxHealth: type.health, hpBar: tHpBar, hpBg: tHpBg });
+        playSound('place');
     }
 });
 
@@ -574,7 +720,6 @@ function spawnEnemy() {
         const hornGeo = new THREE.BoxGeometry(0.15*s, 0.4*s, 0.15*s);
         const hornL = new THREE.Mesh(hornGeo, new THREE.MeshLambertMaterial({ color: 0x424242 })); hornL.position.set(0.25*s, 2.6*s, 1.6*s); hornL.rotation.z = 0.2; enemyGroup.add(hornL);
         const hornR = new THREE.Mesh(hornGeo, new THREE.MeshLambertMaterial({ color: 0x424242 })); hornR.position.set(-0.25*s, 2.6*s, 1.6*s); hornR.rotation.z = -0.2; enemyGroup.add(hornR);
-        // Wings (will be animated)
         const wingGeo = new THREE.BoxGeometry(1.5*s, 0.1*s, 1.2*s);
         const wingMat = new THREE.MeshLambertMaterial({ color: color.color.clone().multiplyScalar(0.7) });
         const wingL = new THREE.Mesh(wingGeo, wingMat); wingL.position.set(-1.4*s, 2.0*s, 0); wingL.rotation.z = 0.15; wingL.castShadow = true; wingL.name = 'wingL'; enemyGroup.add(wingL);
@@ -607,7 +752,6 @@ function spawnEnemy() {
         attackRange = 25; attackDamage = dl.damage; attackCooldown = Math.max(1.5, 4.0 - wave*0.2); attackType = 'dragon_fire';
     }
 
-    // Dragon free-flight state
     let dragonFlightTarget = null;
     let dragonFlightTimer = 0;
 
@@ -627,7 +771,6 @@ function shootProjectile(tower, target) {
     const isSkyCannon = type.antiDragon;
     let mesh;
     if (isSkyCannon) {
-        // Glowing energy bolt for anti-dragon
         const boltGroup = new THREE.Group();
         const core = new THREE.Mesh(new THREE.SphereGeometry(0.2, 8, 8), new THREE.MeshBasicMaterial({ color: type.level === 2 ? 0xff5722 : 0x00e5ff }));
         boltGroup.add(core);
@@ -668,6 +811,7 @@ function animate() {
         if (time % 5 < 0.02 || gameState.wave === 1) {
             gameState.isWaveActive = true;
             gameState.enemiesRemainingToSpawn = 5 + Math.floor(gameState.wave * 1.5);
+            playSound('waveStart');
         }
     }
     if (gameState.isWaveActive && gameState.enemiesRemainingToSpawn > 0) {
@@ -678,6 +822,7 @@ function animate() {
         gameState.wave++;
         gameState.gold += 50;
         updateUI();
+        playSound('waveStart');
     }
 
     // Update enemies
@@ -687,19 +832,16 @@ function animate() {
         else { enemy.speed = enemy.baseSpeed; }
 
         if (enemy.type === 'dragon') {
-            // Dragon free-flight behavior
             enemy.wingPhase += delta * 8;
             const wingL = enemy.mesh.getObjectByName('wingL');
             const wingR = enemy.mesh.getObjectByName('wingR');
             if (wingL) wingL.rotation.z = 0.15 + Math.sin(enemy.wingPhase) * 0.5;
             if (wingR) wingR.rotation.z = -0.15 - Math.sin(enemy.wingPhase) * 0.5;
 
-            // Pick a new flight target periodically
             enemy.dragonFlightTimer -= delta;
             if (!enemy.dragonFlightTarget || enemy.dragonFlightTimer <= 0) {
-                // Fly toward castle or random position within map
                 if (Math.random() < 0.4) {
-                    enemy.dragonFlightTarget = new THREE.Vector3(75.5, 12, 50); // Castle
+                    enemy.dragonFlightTarget = new THREE.Vector3(75.5, 12, 50);
                 } else {
                     enemy.dragonFlightTarget = new THREE.Vector3(
                         5 + Math.random() * 70,
@@ -719,15 +861,12 @@ function animate() {
             } else {
                 enemy.mesh.position.add(dir.multiplyScalar(moveDist));
             }
-            // Keep dragon within map bounds
             enemy.mesh.position.x = Math.max(2, Math.min(GRID_SIZE - 2, enemy.mesh.position.x));
             enemy.mesh.position.z = Math.max(2, Math.min(GRID_SIZE - 2, enemy.mesh.position.z));
             enemy.mesh.position.y = Math.max(8, Math.min(20, enemy.mesh.position.y));
-            // Face direction of travel
             const lookTarget = enemy.mesh.position.clone().add(dir);
             enemy.mesh.lookAt(lookTarget.x, enemy.mesh.position.y, lookTarget.z);
         } else {
-            // Regular path-following enemies
             const targetWp = waypoints[enemy.waypointIndex + 1];
             if (!targetWp) {
                 gameState.lives--;
@@ -735,7 +874,7 @@ function animate() {
                 scene.remove(enemy.mesh);
                 enemies.splice(i, 1);
                 if (gameState.lives <= 0) {
-                    if (gameState.isStarted) { alert('Game Over! Refresh to restart.'); location.reload(); }
+                    if (gameState.isStarted) { playSound('gameOver'); alert('Game Over! Refresh to restart.'); location.reload(); }
                     else { gameState.lives = 20; }
                 }
                 continue;
@@ -758,13 +897,19 @@ function animate() {
             let closest = null, minDst = Infinity;
             for (const enemy of enemies) {
                 const dst = enemy.mesh.position.distanceTo(tower.mesh.position);
-                // Anti-dragon towers only target dragons
                 if (tower.type.antiDragon && enemy.type !== 'dragon') continue;
-                // Regular towers can't target flying dragons
                 if (!tower.type.antiDragon && enemy.type === 'dragon') continue;
                 if (dst <= tower.type.range && dst < minDst) { minDst = dst; closest = enemy; }
             }
-            if (closest) { shootProjectile(tower, closest); tower.cooldown = tower.type.fireRate; }
+            if (closest) {
+                shootProjectile(tower, closest);
+                tower.cooldown = tower.type.fireRate;
+                if (tower.type.name === 'Archer') playSound('archer');
+                else if (tower.type.name === 'Crossbow') playSound('crossbow');
+                else if (tower.type.name === 'Ballista') playSound('ballista');
+                else if (tower.type.name === 'Mage') playSound('mage');
+                else if (tower.type.antiDragon) playSound('skycannon');
+            }
         }
     });
 
@@ -774,23 +919,17 @@ function animate() {
         if (enemy.attackTimer > 0) continue;
 
         if (enemy.type === 'dragon') {
-            // Dragon shoots fireball in the direction it is facing
             enemy.attackTimer = enemy.attackCooldown;
             const mouthPos = new THREE.Vector3(0, 2.1 * enemy.size, 2.2 * enemy.size);
             mouthPos.applyMatrix4(enemy.mesh.matrixWorld);
-
-            // Get dragon's forward direction
             const forward = new THREE.Vector3();
             enemy.mesh.getWorldDirection(forward);
-
-            // Create fireball projectile - single orange ball
             const fireballMesh = new THREE.Mesh(
                 new THREE.SphereGeometry(0.3, 8, 8),
                 new THREE.MeshBasicMaterial({ color: 0xff6600 })
             );
             fireballMesh.position.copy(mouthPos);
             scene.add(fireballMesh);
-
             projectiles.push({
                 mesh: fireballMesh,
                 velocity: forward.multiplyScalar(25),
@@ -798,12 +937,14 @@ function animate() {
                 life: 4.0,
                 isDragonFireball: true
             });
+            playSound('dragonFire');
         } else if (enemy.attackType === 'melee') {
             for (const tower of towers) {
                 const dist = enemy.mesh.position.distanceTo(tower.mesh.position);
                 if (dist < enemy.attackRange + 0.5) {
                     tower.health -= enemy.attackDamage;
                     enemy.attackTimer = enemy.attackCooldown;
+                    playSound('hit');
                     break;
                 }
             }
@@ -821,6 +962,7 @@ function animate() {
                 arrowGroup.position.copy(enemy.mesh.position); arrowGroup.position.y += 1.0;
                 scene.add(arrowGroup);
                 projectiles.push({ mesh: arrowGroup, target: nearestTower, damage: enemy.attackDamage, speed: 20, splash: false, slow: false, isHoming: true, isArrow: true, isEnemyProjectile: true });
+                playSound('skeletonArrow');
             }
         } else if (enemy.attackType === 'spell') {
             enemy.attackTimer = enemy.attackCooldown;
@@ -831,13 +973,14 @@ function animate() {
             spellRing.position.copy(spellOrigin); spellRing.rotation.x = Math.PI/2;
             scene.add(spellRing);
             projectiles.push({ mesh: spellRing, target: null, damage: enemy.attackDamage, speed: 8, splash: true, slow: false, isHoming: false, isArrow: false, isEnemyProjectile: true, isSpell: true, origin: spellOrigin.clone(), maxRange: enemy.attackRange, towers: [...towers] });
+            playSound('wizardSpell');
         }
     }
 
     // Update projectiles
     for (let i = projectiles.length - 1; i >= 0; i--) {
         const p = projectiles[i];
-        
+
         if (p.isDragonFireball) {
             p.life -= delta;
             if (p.life <= 0) {
@@ -845,17 +988,16 @@ function animate() {
                 projectiles.splice(i, 1);
                 continue;
             }
-            
-            // Apply gravity to fireball
             p.velocity.y -= 15 * delta;
             p.mesh.position.add(p.velocity.clone().multiplyScalar(delta));
-            
-            // Check collision with castle
+
             const castlePos = new THREE.Vector3(75.5, 1.5, 50);
             if (p.mesh.position.distanceTo(castlePos) < 8) {
                 gameState.castleHP -= p.damage;
+                playSound('castleHit');
                 if (gameState.castleHP <= 0) {
                     gameState.castleHP = 0;
+                    playSound('gameOver');
                     alert('The Castle has fallen! Game Over! Refresh to restart.');
                     location.reload();
                 }
@@ -864,13 +1006,13 @@ function animate() {
                 projectiles.splice(i, 1);
                 continue;
             }
-            
-            // Check collision with towers
+
             let hitTower = false;
             for (const tower of towers) {
                 if (p.mesh.position.distanceTo(tower.mesh.position) < 1.5) {
                     tower.health -= p.damage;
                     hitTower = true;
+                    playSound('hit');
                     break;
                 }
             }
@@ -882,8 +1024,7 @@ function animate() {
                 }
                 continue;
             }
-            
-            // Check if out of bounds
+
             if (p.mesh.position.x < -5 || p.mesh.position.x > GRID_SIZE + 5 || p.mesh.position.z < -5 || p.mesh.position.z > GRID_SIZE + 5 || p.mesh.position.y < 0) {
                 scene.remove(p.mesh);
                 projectiles.splice(i, 1);
@@ -910,9 +1051,7 @@ function animate() {
         }
 
         let targetPos;
-        if (p.isDragonFireball) {
-            targetPos = p.targetPos;
-        } else if (p.isEnemyProjectile && p.target && towers.includes(p.target)) {
+        if (p.isEnemyProjectile && p.target && towers.includes(p.target)) {
             targetPos = p.target.mesh.position.clone(); targetPos.y += 1.0;
         } else if (p.isHoming && enemies.includes(p.target)) {
             targetPos = p.target.mesh.position.clone(); targetPos.y += p.target.size * 0.8;
@@ -925,37 +1064,26 @@ function animate() {
         const moveDist = p.speed * delta;
 
         if (dist < moveDist + 0.3) {
-            if (p.isDragonFireball) {
-                if (p.isCastleTarget) {
-                    gameState.castleHP -= p.damage;
-                    if (gameState.castleHP <= 0) {
-                        gameState.castleHP = 0;
-                        alert('The Castle has fallen! Game Over! Refresh to restart.');
-                        location.reload();
-                    }
-                    updateUI();
-                } else if (p.target && towers.includes(p.target)) {
-                    p.target.health -= p.damage;
-                }
-            } else if (p.isEnemyProjectile) {
-                if (p.target && towers.includes(p.target)) p.target.health -= p.damage;
+            if (p.isEnemyProjectile) {
+                if (p.target && towers.includes(p.target)) { p.target.health -= p.damage; playSound('hit'); }
             } else {
                 if (enemies.includes(p.target)) {
                     p.target.hp -= p.damage;
                     if (p.slow) p.target.slowTimer = 2;
+                    playSound('hit');
                 }
             }
             scene.remove(p.mesh); projectiles.splice(i, 1);
             for (let j = enemies.length - 1; j >= 0; j--) {
-                if (enemies[j].hp <= 0) { gameState.gold += enemies[j].reward; updateUI(); scene.remove(enemies[j].mesh); enemies.splice(j, 1); }
+                if (enemies[j].hp <= 0) { gameState.gold += enemies[j].reward; updateUI(); scene.remove(enemies[j].mesh); enemies.splice(j, 1); playSound('enemyDeath'); playSound('gold'); }
             }
             for (let j = towers.length - 1; j >= 0; j--) {
-                if (towers[j].health <= 0) { scene.remove(towers[j].mesh); towers.splice(j, 1); }
+                if (towers[j].health <= 0) { scene.remove(towers[j].mesh); towers.splice(j, 1); playSound('hit'); }
             }
         } else {
             dir.normalize();
             p.mesh.position.add(dir.multiplyScalar(moveDist));
-            if (p.isArrow || p.isDragonFireball) p.mesh.lookAt(targetPos);
+            if (p.isArrow) p.mesh.lookAt(targetPos);
         }
     }
 
@@ -983,7 +1111,7 @@ function animate() {
             continue;
         }
         fp.mesh.position.add(fp.velocity.clone().multiplyScalar(delta));
-        fp.velocity.y -= 2 * delta; // gravity
+        fp.velocity.y -= 2 * delta;
         const ratio = fp.life / fp.maxLife;
         fp.mesh.material.opacity = ratio * 0.9;
         const scale = ratio;
