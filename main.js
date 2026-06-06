@@ -553,7 +553,15 @@ function advanceWave() {
     }
     gameState.wave++;
     gameState.gold += 30;
-    gameState.enemiesRemainingToSpawn = 8 + Math.floor(gameState.wave * 3);
+    
+    // Dragon wave logic: waves 6+ are exclusively dragon waves
+    if (gameState.wave >= 6) {
+        const series = Math.floor((gameState.wave - 6) / 5) + 1;
+        gameState.enemiesRemainingToSpawn = series; // Exactly 'series' number of dragons
+    } else {
+        gameState.enemiesRemainingToSpawn = 8 + Math.floor(gameState.wave * 3);
+    }
+    
     gameState.nextWaveTimer = gameState.baseWaveTimer;
     gameState.spawnTimer = 0;
     playSound('waveStart');
@@ -752,7 +760,7 @@ window.addEventListener('mousedown', (e) => {
 
 // --- Dragon color/level based on wave ---
 function getDragonLevel(wave) {
-    if (wave < 6) return { color: materials.green, hp: 100, damage: 20, name: 'green' };
+    if (wave < 6) return { color: materials.green, hp: 500, damage: 20, name: 'green' };
     
     const series = Math.floor((wave - 6) / 5) + 1;
     const waveInSeries = (wave - 6) % 5;
@@ -761,13 +769,13 @@ function getDragonLevel(wave) {
     const colors = [materials.green, materials.blue, materials.yellow, materials.orange, materials.red];
     const colorNames = ['green', 'blue', 'yellow', 'orange', 'red'];
     
-    let hp = 100 + wave * 50;
+    let hp = 500 + wave * 200;
     let damage = 20 + cIndex * 20 + wave * 5;
     
     if (cIndex === 4) {
         // Red dragon is the boss, scales to be a serious threat
         damage = Math.max(50, Math.ceil(gameState.castleMaxHP / (6 - series)));
-        hp = 100 + wave * 100;
+        hp = 1000 + wave * 300;
     }
     
     return { color: colors[cIndex], hp: hp, damage: damage, name: colorNames[cIndex] };
@@ -782,19 +790,13 @@ function spawnEnemy() {
     let reward = 10;
     let color = materials.green;
 
-    // Dragon series logic
-    let dragonsPerWave = 0;
     if (wave >= 6) {
-        const series = Math.floor((wave - 6) / 5) + 1;
-        dragonsPerWave = series;
-    }
-
-    if (wave >= 6 && dragonsPerWave > 0 && gameState.enemiesRemainingToSpawn <= dragonsPerWave && gameState.enemiesRemainingToSpawn > 0) {
+        // It's a dragon wave, spawn ONLY dragons
         type = 'dragon';
         const dl = getDragonLevel(wave);
         hp = dl.hp;
         speed = 2.5 + wave * 0.08;
-        reward = 500 * dragonsPerWave;
+        reward = 500;
         color = dl.color;
     } else if (wave >= 2 && Math.random() < 0.5) { 
         type = 'skeleton'; hp = 30 + wave * 5; speed = 4.0; reward = 20; color = materials.white; 
