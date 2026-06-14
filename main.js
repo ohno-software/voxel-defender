@@ -554,10 +554,10 @@ function advanceWave() {
     gameState.wave++;
     gameState.gold += 30;
     
-    // Dragon wave logic: waves 6+ are exclusively dragon waves
-    if (gameState.wave >= 6) {
-        const series = Math.floor((gameState.wave - 6) / 5) + 1;
-        gameState.enemiesRemainingToSpawn = series; // Exactly 'series' number of dragons
+    // Dragon wave logic: every 6th wave is a dragon wave (5 regular, 1 dragon)
+    if (gameState.wave % 6 === 0) {
+        const dragonWaveIndex = gameState.wave / 6;
+        gameState.enemiesRemainingToSpawn = dragonWaveIndex;
     } else {
         gameState.enemiesRemainingToSpawn = 8 + Math.floor(gameState.wave * 3);
     }
@@ -760,23 +760,21 @@ window.addEventListener('mousedown', (e) => {
 
 // --- Dragon color/level based on wave ---
 function getDragonLevel(wave) {
-    if (wave < 6) return { color: materials.green, hp: 500, damage: 20, name: 'green' };
+    const dragonWaveIndex = Math.floor(wave / 6);
     
-    const series = Math.floor((wave - 6) / 5) + 1;
-    const waveInSeries = (wave - 6) % 5;
-    const cIndex = Math.min(waveInSeries, 4);
+    const baseHp = 150;
+    const hpPerDragonWave = 95;
+    let hp = baseHp + (dragonWaveIndex - 1) * hpPerDragonWave;
+    
+    const maxHp = 1000;
+    hp = Math.min(hp, maxHp);
+    
+    let damage = 20 + dragonWaveIndex * 10;
     
     const colors = [materials.green, materials.blue, materials.yellow, materials.orange, materials.red];
     const colorNames = ['green', 'blue', 'yellow', 'orange', 'red'];
     
-    let hp = 500 + wave * 200;
-    let damage = 20 + cIndex * 20 + wave * 5;
-    
-    if (cIndex === 4) {
-        // Red dragon is the boss, scales to be a serious threat
-        damage = Math.max(50, Math.ceil(gameState.castleMaxHP / (6 - series)));
-        hp = 1000 + wave * 300;
-    }
+    const cIndex = Math.min(dragonWaveIndex - 1, 4);
     
     return { color: colors[cIndex], hp: hp, damage: damage, name: colorNames[cIndex] };
 }
@@ -790,12 +788,12 @@ function spawnEnemy() {
     let reward = 10;
     let color = materials.green;
 
-    if (wave >= 6) {
+    if (wave % 6 === 0) {
         // It's a dragon wave, spawn ONLY dragons
         type = 'dragon';
         const dl = getDragonLevel(wave);
         hp = dl.hp;
-        speed = 2.5 + wave * 0.08;
+        speed = 2.5 + (wave / 6) * 0.08;
         reward = 500;
         color = dl.color;
     } else if (wave >= 2 && Math.random() < 0.5) { 
